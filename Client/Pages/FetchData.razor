@@ -1,0 +1,122 @@
+﻿@page "/fetchdata"
+@using WasmColorCell.Shared
+@inject HttpClient Http
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (ShowPopUp)
+{
+    <BlazorModal Title="@cTittle" IsOpened="true">
+        <ModalBody>
+            <select @bind-value="@ColorChoosen" @bind-value:event="oninput" style="width:50%; height:40px; display: block; margin-left: auto; margin-right: auto; text-align: center;">
+                <option value="0">Lime Green</option>
+                <option value="1">Royal Blue</option>
+                <option value="2">Sandy Brown</option>
+                <option value="3">Orange Red</option>
+                <option value="4">Purple</option>
+                <option value="5">Spring Green</option>
+                <option value="6">Navy</option>
+            </select>
+        </ModalBody>
+        <ModalFooter>
+            <button class="btn btn-primary" @onclick="@ClosePopUp">Ok</button>
+        </ModalFooter>
+    </BlazorModal>
+}
+
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr style="@ReadMyColor(forecast.MyChoosenColor!)">
+                    <td>@forecast.nRow</td>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td @onclick="@(() => InfoRowsClick(forecast))">@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[]? forecasts;
+
+    bool ShowPopUp = false;
+    int? RowNumber;
+    string? SummaryName;
+    string? cTittle;
+    string? ColorChoosen;
+
+    private string[] MyColor = new string[7] { "LimeGreen", "RoyalBlue", "SandyBrown", "OrangeRed", "Purple", "SpringGreen", "Navy" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+    }
+
+    async Task InfoRowsClick(WeatherForecast data)
+    {
+        await Task.Delay(1);
+        ColorChoosen = string.Empty;
+        RowNumber = data.nRow;
+        SummaryName = data.Summary;
+        cTittle = $"Choose The Color For Row : {RowNumber} And Summary : {SummaryName}";
+        ShowPopUp = true;
+    }
+
+    async Task ClosePopUp()
+    {
+        await Task.Delay(1);
+
+        if (!String.IsNullOrWhiteSpace(ColorChoosen))
+        {
+            int MyIndex = int.Parse(ColorChoosen);
+
+            string cColor = MyColor[MyIndex];
+
+            foreach (var dt in forecasts!)
+            {
+                if (dt.nRow == RowNumber)
+                {
+                    dt.MyChoosenColor = cColor;
+                }
+            }
+        }
+
+        ShowPopUp = false;
+    }
+
+    string ReadMyColor(string DataColor)
+    {
+        string DefaultColor = $"background:transparent";
+
+        if (!String.IsNullOrWhiteSpace(DataColor))
+        {
+            DefaultColor = $"background:{DataColor}; color:white; font-weight: bold;";
+        }
+
+        return DefaultColor;
+    }
+}

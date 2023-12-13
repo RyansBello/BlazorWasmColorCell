@@ -1,0 +1,106 @@
+﻿@if (IsOpened)
+{
+    <div class="overlay">
+        <div class="blazor-modal-content">
+            <div class="blazor-modal-header">
+                <h5 class="blazor-modal-title">@Title</h5>
+            </div>
+            <div class="blazor-modal-body">
+                @ModalBody
+            </div>
+            <div class="blazor-modal-footer">
+                @ModalFooter
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalBody { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalFooter { get; set; }
+
+    [Parameter]
+    public bool IsOpened { get; set; }
+}
+
+<style>
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Ubah nilai alpha sesuai kebutuhan */
+    z-index: 1000; /* Pastikan nilai z-index lebih tinggi dari popup */
+}
+
+.blazor-modal-content {
+    width: 650px;
+    margin: auto;
+    margin-top: 150px;
+    background-color: white;
+    border-radius: 20px;
+    -webkit-box-shadow: 6px 4px 38px -21px rgba(0,0,0,0.75);
+    -moz-box-shadow: 6px 4px 38px -21px rgba(0,0,0,0.75);
+    box-shadow: 6px 4px 38px -21px rgba(0,0,0,0.75);
+    overflow: hidden;
+}
+
+.show {
+    display: block;
+    animation-name: show-animation;
+    animation-duration: 1s;
+}
+
+@@keyframes show-animation {
+    from {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+.hide {
+    display: none;
+}
+
+.blazor-modal-header {
+    background-color: #3a0647;
+    padding: 15px;
+    color: white;
+}
+
+.blazor-modal-title {
+    margin: 5px;
+    display: inline-block;
+}
+
+.blazor-modal-close-button {
+    float: right;
+    margin: 5px;
+    cursor: pointer;
+}
+
+    .blazor-modal-close-button:hover {
+        color: red;
+    }
+
+.blazor-modal-body {
+    padding: 10px;
+}
+
+.blazor-modal-footer {
+    background-color: #3a0647;
+    padding: 10px;
+}
+
+</style>
